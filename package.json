@@ -4,6 +4,7 @@
   "description": "The Shell client",
   "main": "src/repl.ts",
   "scripts": {
+    "start": "tsc && node dist/repl.js",
     "lint": "eslint 'src/**/*.ts' --quiet --fix"
   },
   "repository": {
