@@ -1,6 +1,6 @@
 import { createInterface, Interface } from 'readline';
 
-import { statusCommand } from './commands';
+import { statusCommand, startCommand } from './commands';
 import { createFetcher } from './http';
 import { ReplCommandArgs, Context, Fetcher } from './types';
 import { parseCommandLine } from './parser';
@@ -23,6 +23,7 @@ type TryToConnectToTaskmasterdResult =
 
 const CommandsMap = new Map<Commands, ReplCommand>([
     ['status', statusCommand],
+    ['start', startCommand],
     ['help', () => {
         console.log('Available commands:\n');
 

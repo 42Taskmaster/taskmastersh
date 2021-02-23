@@ -1,7 +1,7 @@
 import { request } from 'http';
 
 import {
-    Fetcher, FetcherOptions, FetcherOptionsPost, Response,
+    Fetcher, FetcherOptions, isFetcherOptionsPostWithJSON, Response, FetcherOptionsPost,
 } from './types';
 
 type RequestWrapperArgs =
@@ -16,12 +16,19 @@ interface CreateFetcherArgs {
 export function createFetcher({ hostname, port }: CreateFetcherArgs): Fetcher {
     function requestWrapper(args: RequestWrapperArgs): Promise<Response> {
         return new Promise((resolve, reject) => {
+            const hasJSONBody = isFetcherOptionsPostWithJSON(args.options);
+
             const req = request({
                 hostname,
                 port,
                 method: args.method,
                 path: args.options.path,
-                headers: args.options.headers,
+                headers: {
+                    ...args.options.headers,
+                    ...(hasJSONBody && {
+                        'Content-Type': 'application/json',
+                    }),
+                },
             }, (res) => {
                 resolve(
                     Object.assign(res, {
@@ -43,7 +50,12 @@ export function createFetcher({ hostname, port }: CreateFetcherArgs): Fetcher {
             });
 
             if (args.method === 'POST') {
-                const { body } = args.options;
+                let body: string;
+                if (isFetcherOptionsPostWithJSON(args.options)) {
+                    body = JSON.stringify(args.options.json);
+                } else {
+                    body = args.options.body;
+                }
 
                 req.write(body);
             }
@@ -65,13 +77,13 @@ export function createFetcher({ hostname, port }: CreateFetcherArgs): Fetcher {
             return response;
         },
 
-        async post({ path, headers, body }: FetcherOptionsPost): Promise<Response> {
+        async post({ path, headers, ...args }: FetcherOptionsPost): Promise<Response> {
             const response = await requestWrapper({
                 method: 'POST',
                 options: {
                     path,
                     headers,
-                    body,
+                    ...args,
                 },
             });
 

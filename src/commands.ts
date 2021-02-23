@@ -2,6 +2,7 @@ import {
     Program, ProgramState, ReplCommandArgs,
 } from './types';
 import { getAllPrograms } from './api/get-programs';
+import { startProgram } from './api/start-program';
 
 interface ProgramToPrint {
     state: ProgramState
@@ -64,11 +65,9 @@ function printSingleProgram(programs: Program[], programId: string) {
 }
 
 export async function statusCommand({
-    context,
+    context: { fetcher },
     args,
 }: ReplCommandArgs): Promise<void> {
-    const { fetcher } = context;
-
     const programs = await getAllPrograms(fetcher);
 
     if (typeof args[0] === 'string') {
@@ -79,4 +78,22 @@ export async function statusCommand({
     }
 
     printPrograms(programs);
+}
+
+export async function startCommand({
+    context: { fetcher },
+    args: [commandToStart],
+}: ReplCommandArgs): Promise<void> {
+    if (commandToStart === undefined) {
+        console.log('A program name must be given');
+        return;
+    }
+
+    try {
+        await startProgram(fetcher, commandToStart);
+        console.log(`Program ${commandToStart} sucessfully started`);
+    } catch (err) {
+        console.error(err);
+        console.log(`Could not start program ${commandToStart}`);
+    }
 }

@@ -6,9 +6,29 @@ export interface FetcherOptions {
     headers?: OutgoingHttpHeaders
 }
 
-export interface FetcherOptionsPost extends FetcherOptions {
+export interface FetcherOptionsPostWithJSON extends FetcherOptions {
+    json: unknown
+}
+
+export function isFetcherOptionsPostWithJSON(input: unknown): input is FetcherOptionsPostWithJSON {
+    return (
+        typeof input === 'object'
+        && Reflect.has((input as FetcherOptionsPostWithJSON), 'json')
+    );
+}
+
+export interface FetcherOptionsPostWithBody extends FetcherOptions {
     body: string
 }
+
+export function isFetcherOptionsPostWithBody(input: unknown): input is FetcherOptionsPostWithBody {
+    return (
+        typeof input === 'object'
+        && typeof (input as FetcherOptionsPostWithBody).body === 'string'
+    );
+}
+
+export type FetcherOptionsPost = FetcherOptionsPostWithJSON | FetcherOptionsPostWithBody
 
 export interface Response extends IncomingMessage {
     json(): Promise<unknown>
@@ -16,7 +36,8 @@ export interface Response extends IncomingMessage {
 
 export interface Fetcher {
     get(args: FetcherOptions): Promise<Response>
-    post(args : FetcherOptionsPost): Promise<Response>
+    post(args: FetcherOptionsPostWithBody): Promise<Response>
+    post(args: FetcherOptionsPostWithJSON): Promise<Response>
 }
 
 export interface Context {
@@ -29,6 +50,12 @@ export interface ReplCommandArgs extends ParsedCommand {
 
 export interface ResponseWithError {
     error?: string
+}
+
+function isResponseWithError(input: unknown): input is ResponseWithError {
+    return (
+        ['undefined', 'string'].includes(typeof (input as ResponseWithError).error)
+    );
 }
 
 export enum ProgramState {
@@ -103,4 +130,11 @@ export function isGetAllProgramsResponse(input: unknown): input is GetAllProgram
         typeof input === 'object'
             && isProgramsList((input as GetAllProgramsResponse).result)
     );
+}
+
+export interface StartProgramResponse extends ResponseWithError {
+}
+
+export function isStartProgramResponse(input: unknown): input is StartProgramResponse {
+    return isResponseWithError(input);
 }

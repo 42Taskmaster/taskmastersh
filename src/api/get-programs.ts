@@ -1,6 +1,6 @@
 import { Fetcher, isGetAllProgramsResponse, Program } from '../types';
 
-export async function getAllPrograms(fetcher :Fetcher): Promise<Program[]> {
+export async function getAllPrograms(fetcher: Fetcher): Promise<Program[]> {
     const response = await fetcher.get({
         path: '/status',
     });
