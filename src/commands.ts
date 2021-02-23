@@ -5,6 +5,7 @@ import { getAllPrograms } from './api/get-programs';
 import { startProgram } from './api/start-program';
 import { stopProgram } from './api/stop-program';
 import { restartProgram } from './api/restart-program';
+import { shutdown } from './api/shutdown';
 
 interface ProgramToPrint {
     state: ProgramState
@@ -133,5 +134,18 @@ export async function restartCommand({
     } catch (err) {
         console.error(err);
         console.log(`Could not restart program ${commandToRestart}`);
+    }
+}
+
+export async function shutdownCommand({
+    context: { fetcher },
+}: ReplCommandArgs): Promise<void> {
+    try {
+        await shutdown(fetcher);
+        console.log('Taskmasterd is shutdowning, exiting');
+        process.exit(0);
+    } catch (err) {
+        console.error(err);
+        console.log('Could not shutdown Taskmasterd');
     }
 }

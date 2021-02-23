@@ -36,8 +36,11 @@ export interface Response extends IncomingMessage {
 
 export interface Fetcher {
     get(args: FetcherOptions): Promise<Response>
+
     post(args: FetcherOptionsPostWithBody): Promise<Response>
     post(args: FetcherOptionsPostWithJSON): Promise<Response>
+
+    delete(args: FetcherOptions): Promise<Response>
 }
 
 export interface Context {
@@ -151,4 +154,14 @@ export interface RestartProgramResponse extends ResponseWithError {
 
 export function isRestartProgramResponse(input: unknown): input is RestartProgramResponse {
     return isResponseWithError(input);
+}
+
+interface VersionResponse {
+    result: string
+}
+
+export function isVersionResponse(input: unknown): input is VersionResponse {
+    return (
+        typeof input === 'object' && typeof (input as VersionResponse).result === 'string'
+    );
 }
