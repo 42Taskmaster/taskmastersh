@@ -5,9 +5,12 @@ import { createFetcher } from './http';
 import { ReplCommandArgs, Context, Fetcher } from './types';
 import { parseCommandLine } from './parser';
 
-type ReplCommand = (args: ReplCommandArgs) => Promise<void>
+type ReplCommand =
+    | ((args: ReplCommandArgs) => Promise<void>)
+    | ((args: ReplCommandArgs) => void)
+    | (() => void)
 
-type Commands = 'connect' | 'status' | 'start' | 'restart'| 'stop' | 'refresh' | 'shutdown'
+type Commands = 'status' | 'start' | 'restart'| 'stop' | 'refresh' | 'shutdown' | 'help'
 
 interface AskArgs {
     rl : Interface
@@ -20,7 +23,13 @@ type TryToConnectToTaskmasterdResult =
 
 const CommandsMap = new Map<Commands, ReplCommand>([
     ['status', statusCommand],
-    ['connect', statusCommand],
+    ['help', () => {
+        console.log('Available commands:\n');
+
+        for (const command of CommandsMap.keys()) {
+            console.log(command);
+        }
+    }],
 ]);
 
 function ask({
