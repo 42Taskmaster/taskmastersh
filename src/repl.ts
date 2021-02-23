@@ -24,6 +24,12 @@ async function app() {
         input: process.stdin,
         output: process.stdout,
         prompt: '$> ',
+        completer(line: string) {
+            const completions = [...CommandsMap.keys()];
+            const hits = completions.filter((c) => c.startsWith(line));
+
+            return [hits.length ? hits : completions, line];
+        },
     });
 
     rl.prompt();
