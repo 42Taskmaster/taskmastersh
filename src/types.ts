@@ -41,6 +41,8 @@ export interface Fetcher {
     post(args: FetcherOptionsPostWithJSON): Promise<Response>
 
     delete(args: FetcherOptions): Promise<Response>
+
+    put(args: FetcherOptions): Promise<Response>
 }
 
 export interface Context {
