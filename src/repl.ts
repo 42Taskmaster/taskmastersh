@@ -1,7 +1,12 @@
 import { createInterface, Interface } from 'readline';
 
 import {
-    statusCommand, startCommand, stopCommand, restartCommand, shutdownCommand,
+    statusCommand,
+    startCommand,
+    stopCommand,
+    restartCommand,
+    shutdownCommand,
+    refreshConfigurationCommand,
 } from './commands';
 import { createFetcher } from './http';
 import { ReplCommandArgs, Context, Fetcher } from './types';
@@ -28,6 +33,7 @@ const CommandsMap = new Map<Commands, ReplCommand>([
     ['start', startCommand],
     ['stop', stopCommand],
     ['restart', restartCommand],
+    ['refresh', refreshConfigurationCommand],
     ['shutdown', shutdownCommand],
     ['help', () => {
         console.log('Available commands:\n');

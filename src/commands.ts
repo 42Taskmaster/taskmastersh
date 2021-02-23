@@ -6,6 +6,7 @@ import { startProgram } from './api/start-program';
 import { stopProgram } from './api/stop-program';
 import { restartProgram } from './api/restart-program';
 import { shutdown } from './api/shutdown';
+import { refreshConfiguration } from './api/refresh-configuration';
 
 interface ProgramToPrint {
     state: ProgramState
@@ -147,5 +148,17 @@ export async function shutdownCommand({
     } catch (err) {
         console.error(err);
         console.log('Could not shutdown Taskmasterd');
+    }
+}
+
+export async function refreshConfigurationCommand({
+    context: { fetcher },
+}: ReplCommandArgs): Promise<void> {
+    try {
+        await refreshConfiguration(fetcher);
+        console.log('Taskmasterd configuration has been successfully refreshed');
+    } catch (err) {
+        console.error(err);
+        console.log('Could not refresh Taskmasterd configuration');
     }
 }
