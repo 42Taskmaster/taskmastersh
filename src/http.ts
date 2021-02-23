@@ -5,7 +5,7 @@ import {
 } from './types';
 
 type RequestWrapperArgs =
-    | { method: 'GET', options: FetcherOptions }
+    | { method: 'GET' | 'DELETE', options: FetcherOptions }
     | { method: 'POST', options: FetcherOptionsPost }
 
 interface CreateFetcherArgs {
@@ -84,6 +84,18 @@ export function createFetcher({ hostname, port }: CreateFetcherArgs): Fetcher {
                     path,
                     headers,
                     ...args,
+                },
+            });
+
+            return response;
+        },
+
+        async delete({ path, headers }: FetcherOptionsPost): Promise<Response> {
+            const response = await requestWrapper({
+                method: 'DELETE',
+                options: {
+                    path,
+                    headers,
                 },
             });
 
