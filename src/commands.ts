@@ -1,4 +1,4 @@
-import { ReplCommandArgs, assertContextWithFetcher } from './types';
+import { ReplCommandArgs, assertContextWithFetcher, isGetAllProgramsResponse } from './types';
 
 export async function statusCommand({
     context,
@@ -13,5 +13,11 @@ export async function statusCommand({
 
     const content = await response.json();
 
-    console.log('content', content);
+    if (!isGetAllProgramsResponse(content)) {
+        throw new Error('Invalid content');
+    }
+
+    console.dir(content.result.programs, {
+        depth: null,
+    });
 }
