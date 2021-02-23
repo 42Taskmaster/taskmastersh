@@ -1,6 +1,8 @@
 import { createInterface, Interface } from 'readline';
 
-import { statusCommand, startCommand, stopCommand } from './commands';
+import {
+    statusCommand, startCommand, stopCommand, restartCommand,
+} from './commands';
 import { createFetcher } from './http';
 import { ReplCommandArgs, Context, Fetcher } from './types';
 import { parseCommandLine } from './parser';
@@ -25,6 +27,7 @@ const CommandsMap = new Map<Commands, ReplCommand>([
     ['status', statusCommand],
     ['start', startCommand],
     ['stop', stopCommand],
+    ['restart', restartCommand],
     ['help', () => {
         console.log('Available commands:\n');
 

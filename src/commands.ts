@@ -4,6 +4,7 @@ import {
 import { getAllPrograms } from './api/get-programs';
 import { startProgram } from './api/start-program';
 import { stopProgram } from './api/stop-program';
+import { restartProgram } from './api/restart-program';
 
 interface ProgramToPrint {
     state: ProgramState
@@ -101,18 +102,36 @@ export async function startCommand({
 
 export async function stopCommand({
     context: { fetcher },
-    args: [commandToStart],
+    args: [commandToStop],
 }: ReplCommandArgs): Promise<void> {
-    if (commandToStart === undefined) {
+    if (commandToStop === undefined) {
         console.log('A program name must be given');
         return;
     }
 
     try {
-        await stopProgram(fetcher, commandToStart);
-        console.log(`Program ${commandToStart} sucessfully stopped`);
+        await stopProgram(fetcher, commandToStop);
+        console.log(`Program ${commandToStop} sucessfully stopped`);
     } catch (err) {
         console.error(err);
-        console.log(`Could not stop program ${commandToStart}`);
+        console.log(`Could not stop program ${commandToStop}`);
+    }
+}
+
+export async function restartCommand({
+    context: { fetcher },
+    args: [commandToRestart],
+}: ReplCommandArgs): Promise<void> {
+    if (commandToRestart === undefined) {
+        console.log('A program name must be given');
+        return;
+    }
+
+    try {
+        await restartProgram(fetcher, commandToRestart);
+        console.log(`Program ${commandToRestart} sucessfully restarted`);
+    } catch (err) {
+        console.error(err);
+        console.log(`Could not restart program ${commandToRestart}`);
     }
 }
