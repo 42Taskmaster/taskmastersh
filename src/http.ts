@@ -25,7 +25,7 @@ export function createFetcher({ hostname, port }: CreateFetcherArgs): Fetcher {
             }, (res) => {
                 resolve(
                     Object.assign(res, {
-                        async json(): Promise<JSON> {
+                        async json(): Promise<unknown> {
                             let data = '';
 
                             for await (const chunk of res) {
