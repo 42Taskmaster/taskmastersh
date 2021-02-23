@@ -3,6 +3,7 @@ import {
 } from './types';
 import { getAllPrograms } from './api/get-programs';
 import { startProgram } from './api/start-program';
+import { stopProgram } from './api/stop-program';
 
 interface ProgramToPrint {
     state: ProgramState
@@ -95,5 +96,23 @@ export async function startCommand({
     } catch (err) {
         console.error(err);
         console.log(`Could not start program ${commandToStart}`);
+    }
+}
+
+export async function stopCommand({
+    context: { fetcher },
+    args: [commandToStart],
+}: ReplCommandArgs): Promise<void> {
+    if (commandToStart === undefined) {
+        console.log('A program name must be given');
+        return;
+    }
+
+    try {
+        await stopProgram(fetcher, commandToStart);
+        console.log(`Program ${commandToStart} sucessfully stopped`);
+    } catch (err) {
+        console.error(err);
+        console.log(`Could not stop program ${commandToStart}`);
     }
 }
