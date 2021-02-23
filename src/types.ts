@@ -1,4 +1,5 @@
 import type { OutgoingHttpHeaders, IncomingMessage } from 'http';
+import { ParsedCommand } from './parser';
 
 export interface FetcherOptions {
     path: string
@@ -22,19 +23,12 @@ export interface Context {
     fetcher: Fetcher
 }
 
-export interface ReplCommandArgs {
+export interface ReplCommandArgs extends ParsedCommand {
     context: Context
-    line: string
 }
 
 export interface ResponseWithError {
     error?: string
-}
-
-export interface Process {
-    id: string
-    pid: string
-    state: string
 }
 
 export enum ProgramState {
@@ -46,6 +40,14 @@ export enum ProgramState {
     EXITED = 'EXITED',
     FATAL = 'FATAL',
     UNKNOWN = 'UNKNOWN',
+}
+
+export interface Process {
+    id: string
+    pid: number
+    state: ProgramState
+    startedAt: string
+    endedAt: string
 }
 
 export interface ProgramConfiguration {

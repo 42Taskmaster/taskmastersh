@@ -3,6 +3,7 @@ import { createInterface, Interface } from 'readline';
 import { statusCommand } from './commands';
 import { createFetcher } from './http';
 import { ReplCommandArgs, Context, Fetcher } from './types';
+import { parseCommandLine } from './parser';
 
 type ReplCommand = (args: ReplCommandArgs) => Promise<void>
 
@@ -116,15 +117,16 @@ async function app() {
 
     rl.prompt();
     for await (const line of rl) {
-        const trimmedCommand = line.trim();
+        const { command, args } = parseCommandLine(line);
 
-        const commandToRun = CommandsMap.get(trimmedCommand as Commands);
+        const commandToRun = CommandsMap.get(command as Commands);
         if (commandToRun === undefined) {
             console.error('invalid command');
         } else {
             await commandToRun({
                 context,
-                line,
+                command,
+                args,
             });
         }
 
