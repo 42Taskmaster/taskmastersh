@@ -1,10 +1,8 @@
-import { ReplCommandArgs, assertContextWithFetcher, isGetAllProgramsResponse } from './types';
+import { ReplCommandArgs, isGetAllProgramsResponse } from './types';
 
 export async function statusCommand({
     context,
 }: ReplCommandArgs): Promise<void> {
-    assertContextWithFetcher(context);
-
     const { fetcher } = context;
 
     const response = await fetcher.get({

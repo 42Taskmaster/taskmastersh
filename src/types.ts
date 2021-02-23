@@ -19,13 +19,7 @@ export interface Fetcher {
 }
 
 export interface Context {
-    fetcher?: Fetcher
-}
-
-export function assertContextWithFetcher(context: Context): asserts context is Required<Context> {
-    if (context.fetcher === undefined) {
-        throw new Error('fetcher property of Context must be set; do not forget to call createFetcher function');
-    }
+    fetcher: Fetcher
 }
 
 export interface ReplCommandArgs {

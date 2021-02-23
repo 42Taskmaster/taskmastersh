@@ -10,7 +10,7 @@ type RequestWrapperArgs =
 
 interface CreateFetcherArgs {
     hostname: string
-    port: number
+    port: string
 }
 
 export function createFetcher({ hostname, port }: CreateFetcherArgs): Fetcher {

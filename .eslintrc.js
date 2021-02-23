@@ -30,6 +30,8 @@ module.exports = {
             },
         ],
         'no-shadow': 'off',
+        'no-await-in-loop': 'off',
+        'no-constant-condition': 'off',
         '@typescript-eslint/no-shadow': ['error'],
     },
     settings: {

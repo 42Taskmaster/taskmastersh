@@ -1,23 +1,94 @@
-import { createInterface } from 'readline';
+import { createInterface, Interface } from 'readline';
 
 import { statusCommand } from './commands';
 import { createFetcher } from './http';
-import { ReplCommandArgs, Context } from './types';
+import { ReplCommandArgs, Context, Fetcher } from './types';
 
 type ReplCommand = (args: ReplCommandArgs) => Promise<void>
 
-const CommandsMap = new Map<string, ReplCommand>([
+type Commands = 'connect' | 'status' | 'start' | 'restart'| 'stop' | 'refresh' | 'shutdown'
+
+interface AskArgs {
+    rl : Interface
+    question: string
+}
+
+type TryToConnectToTaskmasterdResult =
+    | { connected: false }
+    | { connected: true; fetcher: Fetcher }
+
+const CommandsMap = new Map<Commands, ReplCommand>([
     ['status', statusCommand],
+    ['connect', statusCommand],
 ]);
 
-async function app() {
-    const context: Context = {
-        fetcher: createFetcher({
-            hostname: 'localhost',
-            port: 8080,
-        }),
-    };
+function ask({
+    rl,
+    question,
+}: AskArgs): Promise<string> {
+    return new Promise((resolve) => {
+        rl.question(question, resolve);
+    });
+}
 
+async function tryToConnectToTaskmasterd(url: string): Promise<TryToConnectToTaskmasterdResult> {
+    try {
+        const parsedURL = new URL(url);
+
+        const fetcher = createFetcher({
+            hostname: parsedURL.hostname,
+            port: parsedURL.port,
+        });
+
+        await fetcher.get({
+            path: '/version',
+        });
+
+        return {
+            connected: true,
+            fetcher,
+        };
+    } catch (err) {
+        return {
+            connected: false,
+        };
+    }
+}
+
+async function askForConnectionURL(rl: Interface): Promise<Fetcher | undefined> {
+    const MAX_TRIES = 3;
+    const DEFAULT_URL = 'http://localhost:8080';
+    let tries = 0;
+
+    while (tries < MAX_TRIES) {
+        const url = await ask({
+            rl,
+            question: `What is the URL of the Taskmasterd you want to connect to? (Default: ${DEFAULT_URL}) `,
+        });
+
+        let urlToConnectTo: string = url;
+        if (url === '') {
+            urlToConnectTo = DEFAULT_URL;
+        }
+
+        console.log('Trying to connect to the Taskmasterd...');
+
+        const connectionTryResult = await tryToConnectToTaskmasterd(urlToConnectTo);
+
+        if (connectionTryResult.connected) {
+            console.log('Connected to the Taskmasterd! 🎉');
+            return connectionTryResult.fetcher;
+        }
+
+        console.log(`Could not connect to ${urlToConnectTo}, try another URL.`);
+
+        tries += 1;
+    }
+
+    return undefined;
+}
+
+async function app() {
     console.log('Welcome to Taskmastersh!');
 
     const rl = createInterface({
@@ -32,12 +103,22 @@ async function app() {
         },
     });
 
-    rl.prompt();
+    const fetcher = await askForConnectionURL(rl);
+    if (fetcher === undefined) {
+        console.log('We exceeded the maximum number of tries, try again later');
+        rl.close();
+        return;
+    }
 
+    const context: Context = {
+        fetcher,
+    };
+
+    rl.prompt();
     for await (const line of rl) {
         const trimmedCommand = line.trim();
 
-        const commandToRun = CommandsMap.get(trimmedCommand);
+        const commandToRun = CommandsMap.get(trimmedCommand as Commands);
         if (commandToRun === undefined) {
             console.error('invalid command');
         } else {
@@ -50,7 +131,7 @@ async function app() {
         rl.prompt();
     }
 
-    console.log('Have a great day!');
+    console.log('\nHave a great day!');
 }
 
 app().catch(console.error);
